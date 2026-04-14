@@ -4,8 +4,6 @@ from fastapi.responses import Response, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
-import io
-import argparse
 import asyncio
 
 app = FastAPI(title="Edge TTS API")
@@ -90,23 +88,6 @@ async def tts_get(
         media_type="audio/mpeg"
     )
 
-# 保持 CLI 兼容性，如果 main.ts 仍需要调用
-async def run_cli():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--text", required=True)
-    parser.add_argument("--voice", default="zh-CN-XiaoxiaoNeural")
-    parser.add_argument("--rate", default="+0%")
-    parser.add_argument("--pitch", default="+0Hz")
-    parser.add_argument("--output", required=True)
-    args = parser.parse_args()
-
-    communicate = edge_tts.Communicate(args.text, args.voice, rate=args.rate, pitch=args.pitch)
-    await communicate.save(args.output)
-
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) > 1:
-        asyncio.run(run_cli())
-    else:
-        import uvicorn
-        uvicorn.run(app, host="0.0.0.0", port=8000)
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
