@@ -27,10 +27,17 @@ class TTSRequest(BaseModel):
     pitch: Optional[str] = "+0Hz"
 
 async def get_tts_stream(text: str, voice: str, rate: str, pitch: str):
-    communicate = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch)
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            yield chunk["data"]
+    try:
+        print(f"Generating TTS: voice={voice}, rate={rate}, pitch={pitch}, text_len={len(text)}")
+        communicate = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch)
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                yield chunk["data"]
+    except Exception as e:
+        print(f"TTS Stream Error: {e}")
+        # 这里不抛出异常，因为已经在生成流中，但我们需要确保客户端知道出错了
+        # 通常这种中途失败会导致音频截断或不可用
+        raise e
 
 @app.get("/v1/models")
 @app.get("/voices")
