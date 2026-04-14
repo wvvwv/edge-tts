@@ -39,6 +39,14 @@ async def get_tts_stream(text: str, voice: str, rate: str, pitch: str):
         # 通常这种中途失败会导致音频截断或不可用
         raise e
 
+@app.get("/")
+async def root():
+    return {"message": "Edge TTS API is running", "docs": "/docs", "voices": "/voices"}
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 @app.get("/v1/models")
 @app.get("/voices")
 async def list_voices():
